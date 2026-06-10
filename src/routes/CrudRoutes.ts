@@ -24,7 +24,7 @@ import { createCrudController } from "../controllers/createCrudController.js";
  * @param service - The service instance that handles persistence.
  * @returns A configured Express `Router`.
  */
-export function createCrudRoutes<T extends { id: string }>(
+export function createCrudRoutes<T extends { _id: string }>(
   service: CrudService<T>
 ): Router {
   const router = Router();

@@ -89,13 +89,13 @@ function record(event: CrmEvent, request: CrmSyncRequest): void {
 export function syncAccount(account: Account, trigger: CrmTrigger): void {
   const event: CrmEvent = {
     kind: "sync",
-    accountId: account.id,
+    accountId: account._id,
     at: new Date().toISOString(),
     detail: `sync (${trigger}); lastActivity=${account.lastActivity ?? "n/a"}`,
     trigger,
     syncStatus: "pending",
   };
-  record(event, { trigger, entityId: account.id, payload: account });
+  record(event, { trigger, entityId: account._id, payload: account });
 }
 
 /**
@@ -107,7 +107,7 @@ export function syncAccount(account: Account, trigger: CrmTrigger): void {
 export function notifyAccountWon(account: Account, offer: BankOffer): void {
   const event: CrmEvent = {
     kind: "won",
-    accountId: account.id,
+    accountId: account._id,
     at: new Date().toISOString(),
     detail: `won auction ${offer.auctionId} via ${offer.bankId} @ ${offer.interestRate}`,
     trigger: "winning_offer_selected",
@@ -115,10 +115,10 @@ export function notifyAccountWon(account: Account, offer: BankOffer): void {
   };
   record(event, {
     trigger: "winning_offer_selected",
-    entityId: account.id,
+    entityId: account._id,
     payload: {
       auctionId: offer.auctionId,
-      winningOfferId: offer.id,
+      winningOfferId: offer._id,
       interestRate: offer.interestRate,
     },
   });

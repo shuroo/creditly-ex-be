@@ -9,7 +9,7 @@ const PAST = new Date(Date.now() - 86_400_000).toISOString();
 const FUTURE = new Date(Date.now() + 86_400_000).toISOString();
 
 const makeOffer = (o: Partial<BankOffer> = {}): BankOffer => ({
-  id: "o1",
+  _id: "o1",
   auctionId: "a1",
   bankId: "bank1",
   interestRate: 5.0,
@@ -18,7 +18,7 @@ const makeOffer = (o: Partial<BankOffer> = {}): BankOffer => ({
 });
 
 const makeAuction = (o: Partial<AuctionOpportunity> = {}): AuctionOpportunity => ({
-  id: "a1",
+  _id: "a1",
   accountId: "acc1",
   model: "SEALED",
   status: "OPEN",
@@ -43,7 +43,7 @@ describe("runExpirySweep", () => {
   });
 
   it("calls settle for each auction", async () => {
-    const auctions = [makeAuction({ id: "a1" }), makeAuction({ id: "a2" })];
+    const auctions = [makeAuction({ _id: "a1" }), makeAuction({ _id: "a2" })];
     (deps.listAuctions as ReturnType<typeof vi.fn>).mockResolvedValue(auctions);
     await runExpirySweep(deps);
     expect(deps.settle).toHaveBeenCalledTimes(2);
@@ -96,8 +96,8 @@ describe("3-day expiry — end-to-end via real settleAuction", () => {
 
   it("marks an auction CLOSED and picks the winner when 3 days have passed with offers", async () => {
     const auction = makeAuction({ expiresAt: THREE_DAYS_AGO });
-    const winner = makeOffer({ id: "w1", interestRate: 3.5 });
-    const loser = makeOffer({ id: "w2", interestRate: 5.0 });
+    const winner = makeOffer({ _id: "w1", interestRate: 3.5 });
+    const loser = makeOffer({ _id: "w2", interestRate: 5.0 });
     await runExpirySweep({
       listAuctions: async () => [auction],
       settle: realSettle([loser, winner]),

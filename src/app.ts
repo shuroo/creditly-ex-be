@@ -70,7 +70,7 @@ const accountSideEffects = {
     }
   },
   persistAccount: async (account: Account): Promise<void> => {
-    await accountService.update(account.id, account);
+    await accountService.update(account._id, account);
   },
 };
 
@@ -84,8 +84,8 @@ async function settleAndPersist(
   auction: AuctionOpportunity,
   options: { force?: boolean } = {}
 ): Promise<AuctionOpportunity> {
-  await settleAuction(auction, await offersForAuction(auction.id), accountSideEffects, options);
-  await auctionService.update(auction.id, auction);
+  await settleAuction(auction, await offersForAuction(auction._id), accountSideEffects, options);
+  await auctionService.update(auction._id, auction);
   return auction;
 }
 
@@ -208,7 +208,7 @@ app.post(
   async (req, res) => {
     const user = req.user!;
     const managerId =
-      user.role === "MANAGER" ? user.id : req.body.managerId ?? user.id;
+      user.role === "MANAGER" ? user._id : req.body.managerId ?? user._id;
 
     const created = await accountService.create({
       customerName: req.body.customerName,
@@ -260,7 +260,7 @@ app.post(
     const created = await eventService.create({
       accountId: req.body.accountId,
       type: req.body.type,
-      createdByUserId: user.id,
+      createdByUserId: user._id,
       createdAt: new Date().toISOString(),
       ...(req.body.description ? { description: req.body.description } : {}),
     });
@@ -303,8 +303,8 @@ app.get(
       // A manager only runs auctions for their own accounts.
       const myAccountIds = new Set(
         (await accountService.findAll())
-          .filter((a) => a.managerId === currentUser.id)
-          .map((a) => a.id)
+          .filter((a) => a.managerId === currentUser._id)
+          .map((a) => a._id)
       );
       auctions = auctions.filter((a) => myAccountIds.has(a.accountId));
     }
@@ -656,11 +656,11 @@ app.get(
     let offers = await bankOfferService.findAll();
 
     if (user.role === "MANAGER") {
-      accounts = accounts.filter((a) => a.managerId === user.id);
-      const myAccountIds = new Set(accounts.map((a) => a.id));
+      accounts = accounts.filter((a) => a.managerId === user._id);
+      const myAccountIds = new Set(accounts.map((a) => a._id));
       auctions = auctions.filter((a) => myAccountIds.has(a.accountId));
       events = events.filter((e) => myAccountIds.has(e.accountId));
-      const myAuctionIds = new Set(auctions.map((a) => a.id));
+      const myAuctionIds = new Set(auctions.map((a) => a._id));
       offers = offers.filter((o) => myAuctionIds.has(o.auctionId));
     }
 

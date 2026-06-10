@@ -29,7 +29,7 @@ import type { Account, BankOffer } from "../../models/types.js";
 // ---------------------------------------------------------------------------
 
 const makeAccount = (o: Partial<Account> = {}): Account => ({
-  id: "acc1",
+  _id: "acc1",
   customerName: "John Smith",
   phone: "050-1234567",
   email: "john@example.com",
@@ -40,7 +40,7 @@ const makeAccount = (o: Partial<Account> = {}): Account => ({
 });
 
 const makeOffer = (o: Partial<BankOffer> = {}): BankOffer => ({
-  id: "offer1",
+  _id: "offer1",
   auctionId: "auc1",
   bankId: "bank1",
   interestRate: 3.5,

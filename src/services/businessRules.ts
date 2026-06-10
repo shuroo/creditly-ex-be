@@ -59,7 +59,7 @@ export async function applyEventRules(
   const cutoff = now - DAY_MS;
   const recentCount = (await deps.listEvents())
     .filter(
-      (e) => e.accountId === account.id && Date.parse(e.createdAt) >= cutoff
+      (e) => e.accountId === account._id && Date.parse(e.createdAt) >= cutoff
     ).length;
   if (recentCount > HIGH_ACTIVITY_THRESHOLD && !account.highActivity) {
     account.highActivity = true;

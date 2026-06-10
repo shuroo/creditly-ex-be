@@ -21,8 +21,8 @@ import type { Role, User } from "../models/types.js";
  * Contains only what the RBAC layer needs; no PII.
  */
 export type AuthUser = {
-  /** User's UUID. */
-  id: string;
+  /** User's UUID (MongoDB `_id`). */
+  _id: string;
   /** RBAC role. */
   role: Role;
   /** Bank affiliation — present only for BANKER users. */
@@ -55,7 +55,7 @@ const TOKEN_TTL = "12h";
  */
 export function signToken(user: User): string {
   const payload: AuthUser = {
-    id: user.id,
+    _id: user._id,
     role: user.role,
     ...(user.bankId ? { bankId: user.bankId } : {}),
   };
@@ -79,7 +79,7 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as AuthUser;
     req.user = {
-      id: decoded.id,
+      _id: decoded._id,
       role: decoded.role,
       ...(decoded.bankId ? { bankId: decoded.bankId } : {}),
     };

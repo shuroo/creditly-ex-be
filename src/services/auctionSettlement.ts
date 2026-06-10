@@ -72,7 +72,7 @@ export async function settleAuction(
   }
 
   auction.status = "CLOSED";
-  auction.winningOfferId = winner.id;
+  auction.winningOfferId = winner._id;
 
   // Winning offer → account marked WON + CRM sync.
   const account = await deps.findAccount(auction.accountId);

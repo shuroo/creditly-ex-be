@@ -14,7 +14,7 @@
 import { Collection } from "mongodb";
 
 /** MongoDB-backed repository providing generic CRUD operations. */
-export class MongoRepository<T extends { id?: string }> {
+export class MongoRepository<T extends { _id?: string }> {
   /**
    * @param collection - The MongoDB collection this repository operates on.
    */
@@ -36,7 +36,7 @@ export class MongoRepository<T extends { id?: string }> {
    * @returns A promise that resolves with the entity, or `null` if not found.
    */
   async findById(id: string): Promise<T | null> {
-    return this.collection.findOne({ id } as any) as Promise<T | null>;
+    return this.collection.findOne({ _id: id } as any) as Promise<T | null>;
   }
 
   /**
@@ -62,11 +62,12 @@ export class MongoRepository<T extends { id?: string }> {
    * @returns A promise that resolves with the updated entity, or `null` if not found.
    */
   async update(id: string, item: Partial<T>): Promise<T | null> {
+    const { _id, ...fields } = item as { _id?: unknown } & Record<string, unknown>;
+    void _id;
     await this.collection.findOneAndUpdate(
-      { id } as any,
-      { $set: item }
+      { _id: id } as any,
+      { $set: fields as any }
     );
-
     return this.findById(id);
   }
 
@@ -78,7 +79,7 @@ export class MongoRepository<T extends { id?: string }> {
    *          `false` if no matching document was found.
    */
   async delete(id: string): Promise<boolean> {
-    const result = await this.collection.deleteOne({ id } as any);
+    const result = await this.collection.deleteOne({ _id: id } as any);
 
     return result.deletedCount > 0;
   }

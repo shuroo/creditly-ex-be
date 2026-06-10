@@ -10,7 +10,7 @@ import type { Account, AuctionOpportunity, Event } from "../../models/types.js";
 import type { AuthUser } from "../../middleware/authContext.js";
 
 const makeAccount = (o: Partial<Account> = {}): Account => ({
-  id: "acc1",
+  _id: "acc1",
   customerName: "Acme",
   phone: "123",
   email: "acme@test.com",
@@ -21,7 +21,7 @@ const makeAccount = (o: Partial<Account> = {}): Account => ({
 });
 
 const makeEvent = (o: Partial<Event> = {}): Event => ({
-  id: "ev1",
+  _id: "ev1",
   accountId: "acc1",
   type: "note_added",
   createdByUserId: "u1",
@@ -30,7 +30,7 @@ const makeEvent = (o: Partial<Event> = {}): Event => ({
 });
 
 const user = (role: AuthUser["role"], id = "u1"): AuthUser => ({
-  id,
+  _id: id,
   role,
 });
 
@@ -54,8 +54,8 @@ describe("canManageAccount", () => {
 
 describe("scopeAccountsForUser", () => {
   const accounts = [
-    makeAccount({ id: "a1", managerId: "mgr1" }),
-    makeAccount({ id: "a2", managerId: "mgr2" }),
+    makeAccount({ _id: "a1", managerId: "mgr1" }),
+    makeAccount({ _id: "a2", managerId: "mgr2" }),
   ];
 
   it("ADMIN sees all accounts", () => {
@@ -65,14 +65,14 @@ describe("scopeAccountsForUser", () => {
   it("MANAGER sees only their accounts", () => {
     const result = scopeAccountsForUser(accounts, user("MANAGER", "mgr1"), []);
     expect(result).toHaveLength(1);
-    expect(result[0]!.id).toBe("a1");
+    expect(result[0]!._id).toBe("a1");
   });
 
   it("USER sees accounts related to their events", () => {
     const events = [makeEvent({ accountId: "a2", createdByUserId: "usr1" })];
     const result = scopeAccountsForUser(accounts, user("USER", "usr1"), events);
     expect(result).toHaveLength(1);
-    expect(result[0]!.id).toBe("a2");
+    expect(result[0]!._id).toBe("a2");
   });
 
   it("USER sees no accounts when they have no events", () => {
@@ -85,7 +85,7 @@ describe("scopeAccountsForUser", () => {
 
   it("BANKER sees accounts that have an open auction they are eligible for", () => {
     const auction: AuctionOpportunity = {
-      id: "auc1",
+      _id: "auc1",
       accountId: "a1",
       model: "SEALED",
       status: "OPEN",
@@ -93,15 +93,15 @@ describe("scopeAccountsForUser", () => {
       openedAt: new Date().toISOString(),
       expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
     };
-    const banker: AuthUser = { id: "b1", role: "BANKER", bankId: "bank1" };
+    const banker: AuthUser = { _id: "b1", role: "BANKER", bankId: "bank1" };
     const result = scopeAccountsForUser(accounts, banker, [], [auction]);
     expect(result).toHaveLength(1);
-    expect(result[0]!.id).toBe("a1");
+    expect(result[0]!._id).toBe("a1");
   });
 
   it("BANKER does not see accounts for closed auctions", () => {
     const auction: AuctionOpportunity = {
-      id: "auc2",
+      _id: "auc2",
       accountId: "a1",
       model: "SEALED",
       status: "CLOSED",
@@ -109,19 +109,19 @@ describe("scopeAccountsForUser", () => {
       openedAt: new Date().toISOString(),
       expiresAt: new Date(Date.now() - 86_400_000).toISOString(),
     };
-    const banker: AuthUser = { id: "b1", role: "BANKER", bankId: "bank1" };
+    const banker: AuthUser = { _id: "b1", role: "BANKER", bankId: "bank1" };
     expect(scopeAccountsForUser(accounts, banker, [], [auction])).toHaveLength(0);
   });
 });
 
 describe("scopeEventsForUser", () => {
   const events = [
-    makeEvent({ id: "e1", accountId: "a1", createdByUserId: "usr1" }),
-    makeEvent({ id: "e2", accountId: "a2", createdByUserId: "usr2" }),
+    makeEvent({ _id: "e1", accountId: "a1", createdByUserId: "usr1" }),
+    makeEvent({ _id: "e2", accountId: "a2", createdByUserId: "usr2" }),
   ];
   const accounts = [
-    makeAccount({ id: "a1", managerId: "mgr1" }),
-    makeAccount({ id: "a2", managerId: "mgr2" }),
+    makeAccount({ _id: "a1", managerId: "mgr1" }),
+    makeAccount({ _id: "a2", managerId: "mgr2" }),
   ];
 
   it("ADMIN sees all events", () => {
@@ -131,13 +131,13 @@ describe("scopeEventsForUser", () => {
   it("MANAGER sees events on their accounts only", () => {
     const result = scopeEventsForUser(events, user("MANAGER", "mgr1"), accounts);
     expect(result).toHaveLength(1);
-    expect(result[0]!.id).toBe("e1");
+    expect(result[0]!._id).toBe("e1");
   });
 
   it("USER sees only their own events", () => {
     const result = scopeEventsForUser(events, user("USER", "usr2"), accounts);
     expect(result).toHaveLength(1);
-    expect(result[0]!.id).toBe("e2");
+    expect(result[0]!._id).toBe("e2");
   });
 
   it("BANKER sees no events", () => {
@@ -164,7 +164,7 @@ describe("stripAccountPII", () => {
     expect(stripped.salary).toBe(25000);
     expect(stripped.loanAmount).toBe(800000);
     expect(stripped.propertyValue).toBe(1200000);
-    expect(stripped.id).toBe(account.id);
+    expect(stripped._id).toBe(account._id);
   });
 });
 
@@ -186,7 +186,7 @@ function bankerView(
 
 describe("BANKER account visibility — PII is never exposed", () => {
   const openAuction: AuctionOpportunity = {
-    id: "auc1",
+    _id: "auc1",
     accountId: "acc1",
     model: "SEALED",
     status: "OPEN",
@@ -196,7 +196,7 @@ describe("BANKER account visibility — PII is never exposed", () => {
   };
 
   const richAccount = makeAccount({
-    id: "acc1",
+    _id: "acc1",
     customerName: "John Smith",
     phone: "050-1234567",
     email: "john@example.com",
@@ -205,7 +205,7 @@ describe("BANKER account visibility — PII is never exposed", () => {
     propertyValue: 1200000,
   });
 
-  const banker: AuthUser = { id: "b1", role: "BANKER", bankId: "bank1" };
+  const banker: AuthUser = { _id: "b1", role: "BANKER", bankId: "bank1" };
 
   it("customerName is absent from the BANKER response", () => {
     const [result] = bankerView([richAccount], banker, [openAuction]);
@@ -229,9 +229,9 @@ describe("BANKER account visibility — PII is never exposed", () => {
     expect(result!.propertyValue).toBe(1200000);
   });
 
-  it("safe fields (id, highActivity, financial) remain visible", () => {
+  it("safe fields (_id, highActivity, financial) remain visible", () => {
     const [result] = bankerView([richAccount], banker, [openAuction]);
-    expect(result!.id).toBe("acc1");
+    expect(result!._id).toBe("acc1");
     expect(result!.highActivity).toBe(false);
     expect(result!.salary).toBe(25000);
   });
@@ -247,7 +247,7 @@ describe("BANKER account visibility — PII is never exposed", () => {
   });
 
   it("BANKER sees no accounts when their bank is not in eligibleBankIds", () => {
-    const otherBanker: AuthUser = { id: "b2", role: "BANKER", bankId: "bank99" };
+    const otherBanker: AuthUser = { _id: "b2", role: "BANKER", bankId: "bank99" };
     expect(bankerView([richAccount], otherBanker, [openAuction])).toHaveLength(0);
   });
 
@@ -262,9 +262,9 @@ describe("BANKER account visibility — PII is never exposed", () => {
   });
 
   it("MANAGER still receives full PII — stripping applies only to BANKERs", () => {
-    const manager: AuthUser = { id: "mgr1", role: "MANAGER" };
+    const manager: AuthUser = { _id: "mgr1", role: "MANAGER" };
     const managerAccount = makeAccount({
-      id: "acc1",
+      _id: "acc1",
       managerId: "mgr1",
       customerName: "John Smith",
       phone: "050-1234567",
@@ -280,7 +280,7 @@ describe("BANKER account visibility — PII is never exposed", () => {
 describe("toPublicUser", () => {
   it("strips the passwordHash field", () => {
     const full = {
-      id: "u1",
+      _id: "u1",
       name: "Alice",
       email: "a@a.com",
       role: "ADMIN" as const,
@@ -288,6 +288,6 @@ describe("toPublicUser", () => {
     };
     const pub = toPublicUser(full);
     expect("passwordHash" in pub).toBe(false);
-    expect(pub.id).toBe("u1");
+    expect(pub._id).toBe("u1");
   });
 });

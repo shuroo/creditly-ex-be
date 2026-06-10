@@ -7,7 +7,7 @@ const PAST = new Date(Date.now() - 86_400_000).toISOString();
 const FUTURE = new Date(Date.now() + 86_400_000).toISOString();
 
 const makeAuction = (o: Partial<AuctionOpportunity> = {}): AuctionOpportunity => ({
-  id: "a1",
+  _id: "a1",
   accountId: "acc1",
   model: "SEALED",
   status: "OPEN",
@@ -18,7 +18,7 @@ const makeAuction = (o: Partial<AuctionOpportunity> = {}): AuctionOpportunity =>
 });
 
 const makeOffer = (o: Partial<BankOffer> = {}): BankOffer => ({
-  id: "o1",
+  _id: "o1",
   auctionId: "a1",
   bankId: "bank1",
   interestRate: 5.0,
@@ -27,7 +27,7 @@ const makeOffer = (o: Partial<BankOffer> = {}): BankOffer => ({
 });
 
 const makeAccount = (o: Partial<Account> = {}): Account => ({
-  id: "acc1",
+  _id: "acc1",
   customerName: "Acme",
   phone: "123",
   email: "acme@test.com",
@@ -75,7 +75,7 @@ describe("settleAuction", () => {
 
   it("marks CLOSED and sets winner when offers exist", async () => {
     const auction = makeAuction();
-    const offer = makeOffer({ id: "w1" });
+    const offer = makeOffer({ _id: "w1" });
     await settleAuction(auction, [offer], deps);
     expect(auction.status).toBe("CLOSED");
     expect(auction.winningOfferId).toBe("w1");
@@ -92,7 +92,7 @@ describe("settleAuction", () => {
 
   it("force-closes an OPEN auction before its expiry window", async () => {
     const auction = makeAuction({ expiresAt: FUTURE });
-    const offer = makeOffer({ id: "forced" });
+    const offer = makeOffer({ _id: "forced" });
     await settleAuction(auction, [offer], deps, { force: true });
     expect(auction.status).toBe("CLOSED");
     expect(auction.winningOfferId).toBe("forced");

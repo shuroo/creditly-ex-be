@@ -16,10 +16,10 @@
     // "types": ["node"],
     // and npm install -D @types/node
 
-    // Other Outputs
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
+    // Other Outputs 
+     "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
 
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,

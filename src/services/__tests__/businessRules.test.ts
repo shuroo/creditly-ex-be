@@ -7,7 +7,7 @@ const NOW = Date.now();
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 const makeAccount = (o: Partial<Account> = {}): Account => ({
-  id: "acc1",
+  _id: "acc1",
   customerName: "Acme",
   phone: "123",
   email: "acme@test.com",
@@ -18,7 +18,7 @@ const makeAccount = (o: Partial<Account> = {}): Account => ({
 });
 
 const makeEvent = (o: Partial<Event> = {}): Event => ({
-  id: "e1",
+  _id: "e1",
   accountId: "acc1",
   type: "note_added",
   createdByUserId: "u1",
@@ -28,7 +28,7 @@ const makeEvent = (o: Partial<Event> = {}): Event => ({
 
 const makeRecentEvents = (count: number): Event[] =>
   Array.from({ length: count }, (_, i) =>
-    makeEvent({ id: `e${i}`, createdAt: new Date(NOW - i * 1000).toISOString() })
+    makeEvent({ _id: `e${i}`, createdAt: new Date(NOW - i * 1000).toISOString() })
   );
 
 let account: Account;
@@ -72,7 +72,7 @@ describe("applyEventRules", () => {
   });
 
   it("ignores events outside the 24-hour window when counting activity", async () => {
-    const old = makeEvent({ id: "old", createdAt: new Date(NOW - DAY_MS - 1000).toISOString() });
+    const old = makeEvent({ _id: "old", createdAt: new Date(NOW - DAY_MS - 1000).toISOString() });
     const recent = makeRecentEvents(3);
     (deps.listEvents as ReturnType<typeof vi.fn>).mockResolvedValue([...recent, old]);
     await applyEventRules(makeEvent(), deps, NOW);

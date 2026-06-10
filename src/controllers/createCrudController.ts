@@ -26,7 +26,7 @@ import { CrudService } from "../services/crudService.js";
  * @param service - The service instance that handles persistence.
  * @returns An object mapping handler names to Express request handlers.
  */
-export function createCrudController<T extends { id: string }>(
+export function createCrudController<T extends { _id: string }>(
   service: CrudService<T>
 ) {
   return {

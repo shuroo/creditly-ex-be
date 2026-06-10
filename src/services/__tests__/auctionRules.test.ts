@@ -3,7 +3,7 @@ import { isExpired, selectWinner } from "../auctionRules.js";
 import type { AuctionOpportunity, BankOffer } from "../../models/types.js";
 
 const makeAuction = (o: Partial<AuctionOpportunity> = {}): AuctionOpportunity => ({
-  id: "a1",
+  _id: "a1",
   accountId: "acc1",
   model: "SEALED",
   status: "OPEN",
@@ -14,7 +14,7 @@ const makeAuction = (o: Partial<AuctionOpportunity> = {}): AuctionOpportunity =>
 });
 
 const makeOffer = (o: Partial<BankOffer> = {}): BankOffer => ({
-  id: "o1",
+  _id: "o1",
   auctionId: "a1",
   bankId: "bank1",
   interestRate: 5.0,
@@ -51,20 +51,20 @@ describe("selectWinner", () => {
   });
 
   it("picks the offer with the lowest interest rate", () => {
-    const low = makeOffer({ id: "low", interestRate: 3 });
-    const high = makeOffer({ id: "high", interestRate: 7 });
+    const low = makeOffer({ _id: "low", interestRate: 3 });
+    const high = makeOffer({ _id: "high", interestRate: 7 });
     expect(selectWinner([high, low])).toBe(low);
   });
 
   it("breaks a tie by earliest createdAt", () => {
-    const first = makeOffer({ id: "first", interestRate: 5, createdAt: new Date(1000).toISOString() });
-    const second = makeOffer({ id: "second", interestRate: 5, createdAt: new Date(2000).toISOString() });
+    const first = makeOffer({ _id: "first", interestRate: 5, createdAt: new Date(1000).toISOString() });
+    const second = makeOffer({ _id: "second", interestRate: 5, createdAt: new Date(2000).toISOString() });
     expect(selectWinner([second, first])).toBe(first);
   });
 
   it("does not beat the winner when a later offer matches its rate", () => {
-    const winner = makeOffer({ id: "w", interestRate: 4, createdAt: new Date(500).toISOString() });
-    const later = makeOffer({ id: "l", interestRate: 4, createdAt: new Date(1500).toISOString() });
+    const winner = makeOffer({ _id: "w", interestRate: 4, createdAt: new Date(500).toISOString() });
+    const later = makeOffer({ _id: "l", interestRate: 4, createdAt: new Date(1500).toISOString() });
     expect(selectWinner([later, winner])).toBe(winner);
   });
 });

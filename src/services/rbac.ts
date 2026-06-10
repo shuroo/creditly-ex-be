@@ -45,7 +45,7 @@ export function stripAccountPII(
  */
 export function canManageAccount(account: Account, user: AuthUser): boolean {
   if (user.role === "ADMIN") return true;
-  if (user.role === "MANAGER") return account.managerId === user.id;
+  if (user.role === "MANAGER") return account.managerId === user._id;
   return false;
 }
 
@@ -76,14 +76,14 @@ export function scopeAccountsForUser(
     case "ADMIN":
       return accounts;
     case "MANAGER":
-      return accounts.filter((a) => a.managerId === user.id);
+      return accounts.filter((a) => a.managerId === user._id);
     case "USER": {
       const relatedIds = new Set(
         userEvents
-          .filter((e) => e.createdByUserId === user.id)
+          .filter((e) => e.createdByUserId === user._id)
           .map((e) => e.accountId)
       );
-      return accounts.filter((a) => relatedIds.has(a.id));
+      return accounts.filter((a) => relatedIds.has(a._id));
     }
     case "BANKER": {
       if (!user.bankId) return [];
@@ -93,7 +93,7 @@ export function scopeAccountsForUser(
           .filter((a) => a.status === "OPEN" && a.eligibleBankIds.includes(bankId))
           .map((a) => a.accountId)
       );
-      return accounts.filter((a) => eligibleAccountIds.has(a.id));
+      return accounts.filter((a) => eligibleAccountIds.has(a._id));
     }
     default:
       return [];
@@ -124,12 +124,12 @@ export function scopeEventsForUser(
       return events;
     case "MANAGER": {
       const myAccountIds = new Set(
-        accounts.filter((a) => a.managerId === user.id).map((a) => a.id)
+        accounts.filter((a) => a.managerId === user._id).map((a) => a._id)
       );
       return events.filter((e) => myAccountIds.has(e.accountId));
     }
     case "USER":
-      return events.filter((e) => e.createdByUserId === user.id);
+      return events.filter((e) => e.createdByUserId === user._id);
     default:
       return [];
   }
