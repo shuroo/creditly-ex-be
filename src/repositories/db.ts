@@ -13,7 +13,9 @@ import { MongoClient } from "mongodb";
 
 process.loadEnvFile();
 
-const client = new MongoClient(process.env.MONGO_URI!);
+const client = new MongoClient(process.env.MONGO_URI!, {
+  serverSelectionTimeoutMS: 3000,
+});
 
 /**
  * Open the MongoDB connection and return the application database handle.

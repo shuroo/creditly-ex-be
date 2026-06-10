@@ -24,31 +24,22 @@ import type {
 import { connectDb } from "./db.js";
 
 const db = await connectDb();
+console.log("[DB] Connected to MongoDB");
 
 /** Repository for {@link User} documents (collection: `"users"`). */
-const userRepository = new MongoRepository<User>(
-  db.collection<User>("users")
-);
+const userRepository = new MongoRepository<User>(db.collection<User>("users"));
 
 /** Repository for {@link Account} documents (collection: `"accounts"`). */
-const accountRepository = new MongoRepository<Account>(
-  db.collection<Account>("accounts")
-);
+const accountRepository = new MongoRepository<Account>(db.collection<Account>("accounts"));
 
 /** Repository for {@link Event} documents (collection: `"events"`). */
-const eventRepository = new MongoRepository<Event>(
-  db.collection<Event>("events")
-);
+const eventRepository = new MongoRepository<Event>(db.collection<Event>("events"));
 
 /** Repository for {@link AuctionOpportunity} documents (collection: `"auctions"`). */
-const auctionRepository = new MongoRepository<AuctionOpportunity>(
-  db.collection<AuctionOpportunity>("auctions")
-);
+const auctionRepository = new MongoRepository<AuctionOpportunity>(db.collection<AuctionOpportunity>("auctions"));
 
 /** Repository for {@link BankOffer} documents (collection: `"bankOffers"`). */
-const bankOfferRepository = new MongoRepository<BankOffer>(
-  db.collection<BankOffer>("bankOffers")
-);
+const bankOfferRepository = new MongoRepository<BankOffer>(db.collection<BankOffer>("bankOffers"));
 
 export {
   userRepository,
