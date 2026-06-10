@@ -13,7 +13,7 @@ import { settleAuction } from "./services/auctionSettlement.js";
 import { getCrmLog } from "./services/crmService.js";
 const app = express();
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: process.env.FRONTEND_URL,
 }));
 app.use(express.json());
 const userService = new CrudService(userRepository);
